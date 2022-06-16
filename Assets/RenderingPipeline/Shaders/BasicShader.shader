@@ -14,18 +14,35 @@ Shader "GameRP/BasicShader"
         Pass
         {
             HLSLPROGRAM
+
+            #pragma target 3.5
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/common.hlsl"
+
+            CBUFFER_START(UnityPerDraw)
+                float4x4 unity_ObjectToWorld;
+            CBUFFER_END
+
+            #define UNITY_MATRIX_M unity_ObjectToWorld
+
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+            #pragma multi_compile_instancing
+
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature ENABLE_SPECULAR
             #pragma shader_feature ENABLE_ATTENUATION
+            
 
+            
+            
             float4x4 unity_MatrixVP;
-            float4x4 unity_ObjectToWorld; //if not using the unity cbuffer
+            //float4x4 unity_ObjectToWorld; //if not using the unity cbuffer
 
             struct Attributes
             {
                 float4 posOS : POSITION;
                 float4 normal : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -38,14 +55,28 @@ Shader "GameRP/BasicShader"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                float4 wPos = mul(unity_ObjectToWorld, IN.posOS);
+                UNITY_SETUP_INSTANCE_ID(IN);
+                float4 wPos = mul(UNITY_MATRIX_M, IN.posOS);
                 OUT.posCS = mul(unity_MatrixVP, wPos);
                 OUT.normal = IN.normal;
                 OUT.posWS = wPos;
                 return OUT;
             }
 
-            cbuffer GamePipelineMaterial : register(b0)
+            CBUFFER_START(UnityPerMaterial)
+                half4 _Color;
+            CBUFFER_END
+
+            CBUFFER_START(UnityPerFrame)
+                float3 _PointLightPos;
+                float _PointLightRange;
+                float3 _WorldSpaceCameraPos;
+                float _SpecIntensity;
+                float3 _PointLightColor;
+                float _SpecExp;
+            CBUFFER_END
+
+            /*cbuffer GamePipelineMaterial : register(b0)
             {
                 half4 _Color : packoffset(c0);
                 float3 _PointLightPos : packoffset(c1);
@@ -54,7 +85,7 @@ Shader "GameRP/BasicShader"
                 float _SpecIntensity : packoffset(c2.w);
                 float3 _PointLightColor : packoffset(c3);
                 float _SpecExp : packoffset(c3.w);
-            }
+            }*/
 
             float3 CalculatePointLighting(Varyings input)
             {
