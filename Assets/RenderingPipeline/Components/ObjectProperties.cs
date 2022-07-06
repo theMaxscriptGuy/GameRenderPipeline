@@ -4,13 +4,27 @@ using UnityEngine;
 
 public class ObjectProperties : MonoBehaviour
 {
-    public Color color = Color.blue;
-    // Start is called before the first frame update
-    void Start()
-    {
-        GetComponent<Renderer>().sharedMaterial.color = color;
-        //GetComponent<Renderer>().sharedMaterial.SetFloat("_SpecExp", Random.Range(1f,100f));
-        //GetComponent<Renderer>().material.SetFloat("_SpecExp", Random.Range(1f,100f));
-        //GetComponent<Renderer>().material.color = color;
-    }
+	public Color color = Color.blue;
+	public float specularity = 1f;
+	public Texture2D TextureA;
+
+	static MaterialPropertyBlock propertyBlock;
+	static int colorID = Shader.PropertyToID("_Color");
+	static int Specularity = Shader.PropertyToID("_SpecIntensity");
+
+	private void Awake()
+	{
+		OnValidate();
+	}
+
+	private void OnValidate()
+	{
+		if (propertyBlock == null)
+		{
+			propertyBlock = new MaterialPropertyBlock();
+		}
+		propertyBlock.SetColor(colorID, color);
+		propertyBlock.SetFloat(Specularity, specularity);
+		GetComponent<MeshRenderer>().SetPropertyBlock(propertyBlock);
+	}
 }

@@ -20,6 +20,7 @@ public class GamePipeline : RenderPipeline
 		
 		foreach(Camera camera in cameras)
 		{
+			Debug.Log($"Rending camera : {camera.name}");
 			camera.TryGetCullingParameters(out var cullingParams);
 
 			var cullingResults = context.Cull(ref cullingParams);
