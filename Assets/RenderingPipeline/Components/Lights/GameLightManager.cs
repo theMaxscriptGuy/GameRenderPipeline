@@ -44,6 +44,27 @@ public class GameLightManager : MonoBehaviour
 	public static float[] PointLightRanges = new float[4];
 	#endregion
 
+	#region SpotLight
+	public static int MaxSpotLights = 4;
+	//we need to get the directional light buffers from the gpu, so its a global shader property:
+	static int SpotLightPos = Shader.PropertyToID("_SpotLightPosArr");
+	static int SpotLightRange = Shader.PropertyToID("_SpotLightRanges");
+	static int SpotLightColor = Shader.PropertyToID("_SpotLightColors");
+	static int SpotLightAngle = Shader.PropertyToID("_SpotLightAngles");
+	static int SpotLightDir = Shader.PropertyToID("_SpotLightDirs");
+	static int SpotOuterCone = Shader.PropertyToID("_SpotOuterCones");
+	static int SpotInnerCone = Shader.PropertyToID("_SpotInnerCones");
+
+	//setup the corresponding data value stores:
+	public static Vector4[] SpotLightPosArr = new Vector4[4];
+	public static float[] SpotLightRanges = new float[4];
+	public static Vector4[] SpotLightColors = new Vector4[4];
+	public static float[] SpotLightAngles = new float[4];
+	public static Vector4[] SpotLightDirs = new Vector4[4];
+	public static float[] SpotOuterCones = new float[4];
+	public static float[] SpotInnerCones = new float[4];
+	#endregion
+
 	internal void SetupLightData()
 	{
 		//setup directional lights:
@@ -71,5 +92,28 @@ public class GameLightManager : MonoBehaviour
 		Shader.SetGlobalVectorArray(PointLightColor, PointLightColors);
 		Shader.SetGlobalVectorArray(PointLightPos, PointLightDirs);
 		Shader.SetGlobalFloatArray(PointLightRange, PointLightRanges);
+
+		//setup point lights:
+		currLights = gameLights.Where(o => o.enabled).Where(o => o.lightType == LIGHT_TYPE.Spot).ToList();
+		for (int i = 0; i < currLights.Count; i++)
+		{
+			if (i >= MaxSpotLights)
+				break;
+			SpotLightColors[i] = ((GameSpotLight)currLights[i]).lightColor;
+			SpotLightPosArr[i] = ((GameSpotLight)currLights[i]).transform.position;
+			SpotLightDirs[i] = -((GameSpotLight)currLights[i]).transform.forward;
+			SpotLightRanges[i] = ((GameSpotLight)currLights[i]).spotLightRange;
+			SpotLightAngles[i] = ((GameSpotLight)currLights[i]).spotLightAngle;
+			SpotOuterCones[i] = ((GameSpotLight)currLights[i]).spotOuterCone;
+			SpotInnerCones[i] = ((GameSpotLight)currLights[i]).spotInnerCone;
+		}
+
+		Shader.SetGlobalVectorArray(SpotLightColor, SpotLightColors);
+		Shader.SetGlobalVectorArray(SpotLightPos, SpotLightPosArr);
+		Shader.SetGlobalVectorArray(SpotLightDir, SpotLightDirs);
+		Shader.SetGlobalFloatArray(SpotLightRange, SpotLightRanges);
+		Shader.SetGlobalFloatArray(SpotLightAngle, SpotLightAngles);
+		Shader.SetGlobalFloatArray(SpotOuterCone, SpotOuterCones);
+		Shader.SetGlobalFloatArray(SpotInnerCone, SpotInnerCones);
 	}
 }

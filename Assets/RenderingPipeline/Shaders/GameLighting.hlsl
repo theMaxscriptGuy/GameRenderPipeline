@@ -27,13 +27,13 @@ float3 _DirectionalLightDirs[MAX_DIR_LIGHTS];
 float3 _DirectionalLightColors[MAX_DIR_LIGHTS];
 
 //for spot light:
-float3 _SpotLightPos;
-float _SpotLightRange;
-float _SpotLightAngle;
-float3 _SpotLightDir;
-float4 _SpotLightColor;
-float _SpotOuterCone;
-float _SpotInnerCone;
+float4 _SpotLightColors[MAX_SPOT_LIGHTS];
+float3 _SpotLightDirs[MAX_SPOT_LIGHTS];
+float _SpotLightRanges[MAX_SPOT_LIGHTS];
+float3 _SpotLightPosArr[MAX_SPOT_LIGHTS];
+float _SpotLightAngles[MAX_SPOT_LIGHTS];
+float _SpotOuterCones[MAX_SPOT_LIGHTS];
+float _SpotInnerCones[MAX_SPOT_LIGHTS];
 
 //for capsule light:
 float3 _CapsuleLightPos;
@@ -51,7 +51,18 @@ struct GameLight
 {
     float3 color;
     float3 direction;
-    float3 range;
+    float range;
+};
+
+struct GameLightSpot
+{
+    float3 color;
+    float3 direction;
+    float range;
+    float3 pos;
+    float angle;
+    float outerCone;
+    float innerCone;
 };
 
 /******************************************************************************************************/
@@ -72,6 +83,19 @@ GameLight GetPointLight(int id)
     light.color = _PointLightColor[id];
     light.direction = _PointLightPos[id];
     light.range = _PointLightRange[id];
+    return light;
+}
+
+GameLightSpot GetSpotLight(int id)
+{
+    GameLightSpot light;
+    light.color = _SpotLightColors[id];
+    light.direction = _SpotLightDirs[id];
+    light.range = _SpotLightRanges[id];
+    light.pos = _SpotLightPosArr[id];
+    light.angle = _SpotLightAngles[id];
+    light.outerCone = _SpotOuterCones[id];
+    light.innerCone = _SpotInnerCones[id];
     return light;
 }
 
@@ -123,11 +147,6 @@ float3 CalculatePointLighting(Varyings input, float4 clr)
     return clr * outColor;
 }
 
-float3 CalculateAllDirLights(float3 normalizedNormals, float4 posWS)
-{
-    
-}
-
 float3 CalculateDirectionalLighting(Varyings input, float4 clr)
 {
     float3 normalizedNormals = normalize(input.normalWS);
@@ -152,33 +171,41 @@ float3 CalculateDirectionalLighting(Varyings input, float4 clr)
 
 float3 CalculateSpotLighting(Varyings input, float4 clr)
 {
-    float3 normalizedNormals = normalize(input.normalWS);
-    float3 toLight = _SpotLightPos - input.posWS;
-    float3 toEye = _WorldSpaceCameraPos.xyz - input.posWS;
-    float distToLight = length(toLight);
+    float3 outColor = 0;
 
-    //phong diffuse:
-    toLight /= distToLight;
-    float NDotL = saturate(dot(toLight, normalizedNormals));
-    float3 finalColor = _SpotLightColor * NDotL;
+    for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
+    {
+        GameLightSpot light = GetSpotLight(i);
+        float3 normalizedNormals = normalize(input.normalWS);
+        float3 toLight = light.pos - input.posWS;
+        float3 toEye = _WorldSpaceCameraPos.xyz - input.posWS;
+        float distToLight = length(toLight);
+
+        //phong diffuse:
+        toLight /= distToLight;
+        float NDotL = saturate(dot(toLight, normalizedNormals));
+        float3 finalColor = light.color * NDotL;
 
 #ifdef ENABLE_SPECULAR
-    //Blinn Specular:
-    float spec = CalculateBlinnSpecular(input.posWS, normalizedNormals, toLight);
-    finalColor += _SpotLightColor.rgb * spec;
+        //Blinn Specular:
+        float spec = CalculateBlinnSpecular(input.posWS, normalizedNormals, toLight);
+        finalColor += light.color.rgb * spec;
 #endif
 
-    //cone attenuation:
-    float cosAng = dot(_SpotLightDir, toLight);
-    float conAttn = saturate((cosAng - _SpotOuterCone) * _SpotInnerCone);
-    conAttn *= conAttn;
-    
-    float distToLightNorm = 1.0 - saturate(distToLight * _SpotLightRange);
-    float Attn = distToLightNorm * distToLightNorm;
+        //cone attenuation:
+        float cosAng = dot(light.direction, toLight);
+        float conAttn = saturate((cosAng - light.outerCone) * light.innerCone);
+        conAttn *= conAttn;
 
-    finalColor *= clr.rgb * Attn * conAttn;
+        float distToLightNorm = 1.0 - saturate(distToLight * light.range);
+        float Attn = distToLightNorm * distToLightNorm;
 
-    return finalColor;
+        finalColor *= clr.rgb * Attn * conAttn;
+
+        outColor += finalColor;
+    }
+
+    return clr * outColor;
 }
 
 float3 CalculateCapsuleLighting(Varyings input, float4 clr)

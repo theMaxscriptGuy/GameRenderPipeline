@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteAlways]
-public class GameSpotLight : MonoBehaviour
+public class GameSpotLight : GameLight
 {
-    public float Intensity = 1f;
-    public float SpotLightRange = 1f;
-    public float SpotLightAngle=50f;
-    public Color SpotLightColor = Color.yellow;
-    public float SpotOuterCone = 100f;
-    public float SpotInnerCone = 50f;
+    [SerializeField]
+    private float SpotLightAngle = 50f;
+    [SerializeField]
+    private float SpotLightRange = 1f;
+    [SerializeField]
+    private float SpotOuterCone = 100f;
+    [SerializeField]
+    private float SpotInnerCone = 50f;
 
-    // Update is called once per frame
-    void Update()
+    internal float spotLightAngle { get => Mathf.Cos(SpotLightAngle); }
+    internal float spotLightRange { get => 1.0f / SpotLightRange; }
+    internal float spotOuterCone { get => Mathf.Cos(SpotOuterCone); }
+    internal float spotInnerCone { get => Mathf.Cos(1.0f / SpotInnerCone); }
+
+    private void Awake()
     {
-        //range has to be reciprocal:
-        Shader.SetGlobalFloat("_SpotLightRange", 1.0f/SpotLightRange);
-        Shader.SetGlobalFloat("_SpotLightAngle", Mathf.Cos(SpotLightAngle));
-        Shader.SetGlobalColor("_SpotLightColor", SpotLightColor * Intensity);
-        
-        //Outer and Inner angles will be passed with cos of the actual values:
-        Shader.SetGlobalFloat("_SpotOuterCone", Mathf.Cos(SpotOuterCone));
-        Shader.SetGlobalFloat("_SpotInnerCone", Mathf.Cos(1.0f/SpotInnerCone));
-        Shader.SetGlobalVector("_SpotLightPos", transform.position);
-        Shader.SetGlobalVector("_SpotLightDir", -transform.forward);
+        lightType = LIGHT_TYPE.Spot;
     }
 }
 
