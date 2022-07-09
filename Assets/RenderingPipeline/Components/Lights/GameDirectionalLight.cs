@@ -11,9 +11,8 @@ public class GameDirectionalLight : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Shader.SetGlobalVector("_PointLightPos", transform.position);
-        Shader.SetGlobalVector("_WorldSpaceCameraPos", cam.transform.position);
-        Shader.SetGlobalColor("_PointLightColor", LightColor);
+        Shader.SetGlobalVector("_DirectionalLightDir", -transform.forward);
+        Shader.SetGlobalColor("_DirectionalLightColor", LightColor * Intensity);
     }
 }
 
