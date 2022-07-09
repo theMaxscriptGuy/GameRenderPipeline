@@ -31,7 +31,6 @@ float4 _SpotLightColors[MAX_SPOT_LIGHTS];
 float3 _SpotLightDirs[MAX_SPOT_LIGHTS];
 float _SpotLightRanges[MAX_SPOT_LIGHTS];
 float3 _SpotLightPosArr[MAX_SPOT_LIGHTS];
-float _SpotLightAngles[MAX_SPOT_LIGHTS];
 float _SpotOuterCones[MAX_SPOT_LIGHTS];
 float _SpotInnerCones[MAX_SPOT_LIGHTS];
 
@@ -60,7 +59,6 @@ struct GameLightSpot
     float3 direction;
     float range;
     float3 pos;
-    float angle;
     float outerCone;
     float innerCone;
 };
@@ -93,7 +91,6 @@ GameLightSpot GetSpotLight(int id)
     light.direction = _SpotLightDirs[id];
     light.range = _SpotLightRanges[id];
     light.pos = _SpotLightPosArr[id];
-    light.angle = _SpotLightAngles[id];
     light.outerCone = _SpotOuterCones[id];
     light.innerCone = _SpotInnerCones[id];
     return light;

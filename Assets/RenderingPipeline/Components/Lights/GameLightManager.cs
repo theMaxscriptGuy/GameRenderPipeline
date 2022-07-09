@@ -103,7 +103,6 @@ public class GameLightManager : MonoBehaviour
 			SpotLightPosArr[i] = ((GameSpotLight)currLights[i]).transform.position;
 			SpotLightDirs[i] = -((GameSpotLight)currLights[i]).transform.forward;
 			SpotLightRanges[i] = ((GameSpotLight)currLights[i]).spotLightRange;
-			SpotLightAngles[i] = ((GameSpotLight)currLights[i]).spotLightAngle;
 			SpotOuterCones[i] = ((GameSpotLight)currLights[i]).spotOuterCone;
 			SpotInnerCones[i] = ((GameSpotLight)currLights[i]).spotInnerCone;
 		}
@@ -112,7 +111,6 @@ public class GameLightManager : MonoBehaviour
 		Shader.SetGlobalVectorArray(SpotLightPos, SpotLightPosArr);
 		Shader.SetGlobalVectorArray(SpotLightDir, SpotLightDirs);
 		Shader.SetGlobalFloatArray(SpotLightRange, SpotLightRanges);
-		Shader.SetGlobalFloatArray(SpotLightAngle, SpotLightAngles);
 		Shader.SetGlobalFloatArray(SpotOuterCone, SpotOuterCones);
 		Shader.SetGlobalFloatArray(SpotInnerCone, SpotInnerCones);
 	}
