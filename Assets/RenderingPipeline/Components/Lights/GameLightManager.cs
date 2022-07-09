@@ -65,6 +65,23 @@ public class GameLightManager : MonoBehaviour
 	public static float[] SpotInnerCones = new float[4];
 	#endregion
 
+	#region CapsuleLight
+	public static int MaxCapsuleLights = 4;
+	//we need to get the directional light buffers from the gpu, so its a global shader property:
+	static int CapsuleLightPos = Shader.PropertyToID("_CapsuleLightPosArr");
+	static int CapsuleLightRange = Shader.PropertyToID("_CapsuleLightRanges");
+	static int CapsuleLightColor = Shader.PropertyToID("_CapsuleLightColors");
+	static int CapsuleLightDir = Shader.PropertyToID("_CapsuleLightDirs");
+	static int CapsuleLightLength = Shader.PropertyToID("_CapsuleLightLens");
+
+	//setup the corresponding data value stores:
+	public static Vector4[] CapsuleLightPosArr = new Vector4[4];
+	public static float[] CapsuleLightRanges = new float[4];
+	public static Vector4[] CapsuleLightColors = new Vector4[4];
+	public static Vector4[] CapsuleLightDirs = new Vector4[4];
+	public static float[] CapsuleLightLengths = new float[4];
+	#endregion
+
 	internal void SetupLightData()
 	{
 		//setup directional lights:
@@ -93,7 +110,7 @@ public class GameLightManager : MonoBehaviour
 		Shader.SetGlobalVectorArray(PointLightPos, PointLightDirs);
 		Shader.SetGlobalFloatArray(PointLightRange, PointLightRanges);
 
-		//setup point lights:
+		//setup spot lights:
 		currLights = gameLights.Where(o => o.enabled).Where(o => o.lightType == LIGHT_TYPE.Spot).ToList();
 		for (int i = 0; i < currLights.Count; i++)
 		{
@@ -113,5 +130,24 @@ public class GameLightManager : MonoBehaviour
 		Shader.SetGlobalFloatArray(SpotLightRange, SpotLightRanges);
 		Shader.SetGlobalFloatArray(SpotOuterCone, SpotOuterCones);
 		Shader.SetGlobalFloatArray(SpotInnerCone, SpotInnerCones);
+
+		//setup capsule lights:
+		currLights = gameLights.Where(o => o.enabled).Where(o => o.lightType == LIGHT_TYPE.Capsule).ToList();
+		for (int i = 0; i < currLights.Count; i++)
+		{
+			if (i >= MaxCapsuleLights)
+				break;
+			CapsuleLightColors[i] = ((GameCapsuleLight)currLights[i]).lightColor;
+			CapsuleLightPosArr[i] = ((GameCapsuleLight)currLights[i]).transform.position;
+			CapsuleLightDirs[i] = ((GameCapsuleLight)currLights[i]).transform.up;
+			CapsuleLightRanges[i] = ((GameCapsuleLight)currLights[i]).range;
+			CapsuleLightLengths[i] = ((GameCapsuleLight)currLights[i]).Length;
+		}
+
+		Shader.SetGlobalVectorArray(CapsuleLightColor, CapsuleLightColors);
+		Shader.SetGlobalVectorArray(CapsuleLightPos, CapsuleLightPosArr);
+		Shader.SetGlobalVectorArray(CapsuleLightDir, CapsuleLightDirs);
+		Shader.SetGlobalFloatArray(CapsuleLightRange, CapsuleLightRanges);
+		Shader.SetGlobalFloatArray(CapsuleLightLength, CapsuleLightLengths);
 	}
 }

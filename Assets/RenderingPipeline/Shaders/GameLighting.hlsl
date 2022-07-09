@@ -35,11 +35,11 @@ float _SpotOuterCones[MAX_SPOT_LIGHTS];
 float _SpotInnerCones[MAX_SPOT_LIGHTS];
 
 //for capsule light:
-float3 _CapsuleLightPos;
-float _CapsuleLightRange;
-float3 _CapsuleLightDir;
-float3 _CapsuleLightColor;
-float _CapsuleLightLen;
+float3 _CapsuleLightPosArr[MAX_CAPSULE_LIGHTS];
+float _CapsuleLightRanges[MAX_CAPSULE_LIGHTS];
+float3 _CapsuleLightDirs[MAX_CAPSULE_LIGHTS];
+float3 _CapsuleLightColors[MAX_CAPSULE_LIGHTS];
+float _CapsuleLightLens[MAX_CAPSULE_LIGHTS];
 CBUFFER_END
 
 /******************************************************************************************************/
@@ -51,6 +51,15 @@ struct GameLight
     float3 color;
     float3 direction;
     float range;
+};
+
+struct GameLightCapsule
+{
+    float3 color;
+    float3 direction;
+    float3 position;
+    float range;
+    float length;
 };
 
 struct GameLightSpot
@@ -93,6 +102,17 @@ GameLightSpot GetSpotLight(int id)
     light.pos = _SpotLightPosArr[id];
     light.outerCone = _SpotOuterCones[id];
     light.innerCone = _SpotInnerCones[id];
+    return light;
+}
+
+GameLightCapsule GetCapsuleLight(int id)
+{
+    GameLightCapsule light;
+    light.position = _CapsuleLightPosArr[id];
+    light.range = _CapsuleLightRanges[id];
+    light.color = _CapsuleLightColors[id];
+    light.direction = _CapsuleLightDirs[id];
+    light.length = _CapsuleLightLens[id];
     return light;
 }
 
@@ -207,23 +227,31 @@ float3 CalculateSpotLighting(Varyings input, float4 clr)
 
 float3 CalculateCapsuleLighting(Varyings input, float4 clr)
 {
+    float3 outColor = 0;
     float3 normalizedNormals = normalize(input.normalWS);
-    float3 toEye = _WorldSpaceCameraPos.xyz - input.posWS;
-    float3 toCapsuleStart = input.posWS - _CapsuleLightPos;
-    float distOnLine = dot(toCapsuleStart, _CapsuleLightDir) / _CapsuleLightLen;
-    distOnLine = saturate(distOnLine) * _CapsuleLightRange;
-    float3 pointOnLine = _CapsuleLightPos + _CapsuleLightDir * distOnLine;
+    
+    for (int i = 0; i < MAX_CAPSULE_LIGHTS; i++)
+    {
+        GameLightCapsule light = GetCapsuleLight(i);
+        float3 toEye = _WorldSpaceCameraPos.xyz - input.posWS;
+        float3 toCapsuleStart = input.posWS - light.position;
+        float distOnLine = dot(toCapsuleStart, light.direction) / light.length;
+        distOnLine = saturate(distOnLine) * light.length;
+        float3 pointOnLine = light.position + (light.direction * distOnLine);
 
-    float3 toLight = pointOnLine - input.posWS;
-    float distToLight = length(toLight);
+        float3 toLight = pointOnLine - input.posWS;
+        float distToLight = length(toLight);
 
-    //phong diffuse:
-    toLight /= distToLight;
-    float NDotL = saturate(dot(toLight, normalizedNormals));
-    float3 finalColor = clr * NDotL;
+        //phong diffuse:
+        toLight /= distToLight;
+        float NDotL = saturate(dot(toLight, normalizedNormals));
+        float3 finalColor = light.color * NDotL;
 
-    //Attenuation:
-    float distToLightNorm = 1.0 - saturate(distToLight * _CapsuleLightRange);
-    float Attn = distToLightNorm * distToLightNorm;
-    return finalColor * _CapsuleLightColor * Attn;
+        //Attenuation:
+        float distToLightNorm = 1.0 - saturate(distToLight * light.range);
+        float Attn = distToLightNorm * distToLightNorm;
+        
+        outColor += finalColor * light.color * Attn;
+    }
+    return clr * outColor;
 }
