@@ -4,9 +4,12 @@ using UnityEngine.Rendering;
 public class GamePipeline : RenderPipeline
 {
 	private GamePipelineAsset renderPipelineAsset;
+	private GameLightManager lightManager;
 	public GamePipeline(GamePipelineAsset rpAsset)
 	{
 		renderPipelineAsset = rpAsset;
+		lightManager = new GameLightManager();
+		lightManager.Initialize();
 	}
 
 #if UNITY_EDITOR
@@ -24,6 +27,9 @@ public class GamePipeline : RenderPipeline
 	{
 		Debug.Log(renderPipelineAsset.rendererName);
 
+		//setup light data:
+		lightManager.SetupLightData();
+
 		CommandBuffer cmd = CommandBufferPool.Get("MainLoop");
 		cmd.ClearRenderTarget(true, true, renderPipelineAsset.clearColor);
 		context.ExecuteCommandBuffer(cmd);
@@ -32,6 +38,8 @@ public class GamePipeline : RenderPipeline
 		foreach (Camera camera in cameras)
 		{
 			Debug.Log($"Rending camera : {camera.name}");
+			Shader.SetGlobalVector("_WorldSpaceCameraPos", camera.transform.position);
+
 			camera.TryGetCullingParameters(out var cullingParams);
 
 			var cullingResults = context.Cull(ref cullingParams);

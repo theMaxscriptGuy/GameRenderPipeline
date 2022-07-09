@@ -2,34 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways]
-public class GameLight : MonoBehaviour
+/// <summary>
+/// Core light class that defines basic parameters and virtual functions to be overridden
+/// </summary>
+
+public enum LIGHT_TYPE
 {
-    public float Range = 1f;
-    public Color LightColor = Color.yellow;
-    public Camera cam;
-    // Update is called once per frame
-    void Update()
-    {
-        UpdateLight();
-    }
+	Directional,
+	Point,
+	Spot,
+	Capsule
+}
+public abstract class GameLight : MonoBehaviour
+{
+	internal LIGHT_TYPE lightType;
 
-    private void OnEnable()
-    {
-        
-    }
+	//Basic properties of light:
+	[SerializeField]
+	private Color color = Color.cyan;
+	[SerializeField]
+	private float intensity = 1f;
 
-    private void OnDisable()
-    {
-        
-    }
-
-    private void UpdateLight()
-    {
-        Shader.SetGlobalVector("_PointLightPos", transform.position);
-        Shader.SetGlobalVector("_WorldSpaceCameraPos", cam.transform.position);
-        Shader.SetGlobalColor("_PointLightColor", LightColor);
-        Shader.SetGlobalFloat("_PointLightRange",1.0f/Range);
-    }
+	internal Color lightColor { get => color*intensity; }
 }
 
