@@ -43,9 +43,6 @@ Shader "GameRP/BasicShader"
 
             #include "GameInput.hlsl"
             #include "GameLighting.hlsl"
-            #include "Shadows.hlsl"
-
-
 
             #pragma vertex vert
             #pragma fragment frag

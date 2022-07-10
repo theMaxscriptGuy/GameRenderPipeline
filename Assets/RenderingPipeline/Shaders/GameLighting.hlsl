@@ -3,6 +3,8 @@ CBUFFER_START(CustomCamera)
 float3 _WorldSpaceCameraPos;
 CBUFFER_END
 
+#include "Shadows.hlsl"
+
 /******************************************************************************************************/
 /*****************************************LIGHT COUNTS***********************************************/
 /******************************************************************************************************/
@@ -183,7 +185,10 @@ float3 CalculateDirectionalLighting(Varyings input, float4 clr)
         outColor += finalColor;
     }
 
-    return clr * outColor;
+    //get the directional light attenuation for the very first light:
+    float3 posSTS = mul(_DirectionalShadowMatrix, input.posWS).xyz;
+    float shadow = SampleDirectionalShadowAtlas(posSTS);
+    return clr * outColor * shadow;
 }
 
 float3 CalculateSpotLighting(Varyings input, float4 clr)

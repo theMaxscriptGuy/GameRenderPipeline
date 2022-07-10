@@ -254,7 +254,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &413801675
 Transform:
   m_ObjectHideFlags: 0
@@ -291,7 +291,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 413801674}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -379,7 +379,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &540806611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,7 +404,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 540806610}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
@@ -731,7 +731,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &772192483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,7 +769,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 772192482}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -968,7 +968,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &920123237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1006,7 +1006,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920123236}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -1199,7 +1199,7 @@ GameObject:
   - component: {fileID: 1031091605}
   - component: {fileID: 1031091604}
   m_Layer: 0
-  m_Name: Directional Light
+  m_Name: DirShadowLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1237,7 +1237,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1288,13 +1288,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031091603}
-  m_LocalRotation: {x: 0.3096162, y: -0.17243856, z: 0.1316441, w: 0.9257822}
+  m_LocalRotation: {x: 0.14793588, y: -0.73628384, z: 0.30217174, w: 0.587106}
   m_LocalPosition: {x: 0.31937608, y: 0.948, z: -1.817}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 38.219, y: -17.616, z: 10.04}
+  m_LocalEulerAnglesHint: {x: 38.22, y: -99.376, z: 10.04}
 --- !u!1 &1040058804
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,7 +1425,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1040445157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1465,7 +1465,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1040445156}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
@@ -1633,7 +1633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1268979434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1793,7 +1793,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1526552255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2106,7 +2106,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1958282243
 MonoBehaviour:
   m_ObjectHideFlags: 0

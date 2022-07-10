@@ -9,12 +9,10 @@ public class GameShadowManager
 {
 	//for now we are just trying to add shadow using the first light that unity gets,
 	//ideally this is done when you have to add shadows to multiple lights:
-	private static int s_shadowTextureID = Shader.PropertyToID("_DirectionalShadowsID");
-	private static int dirShadowMatricesID = Shader.PropertyToID("_DirectionalShadowMatrices");
-	private static int dirLightShadowDataId = Shader.PropertyToID("_DirectionalLightShadowData");
+	private static int s_shadowTextureMapID = Shader.PropertyToID("_DirectionalShadowsMap");
+	private static int dirShadowMatricesID = Shader.PropertyToID("_DirectionalShadowMatrix");
 
-	private static Matrix4x4[] dirShadowMatrices = new Matrix4x4[1]; //here you provide the max directional lights.
-	private static Vector4[] dirLightShadowData = new Vector4[1]; // this holds the shadow strength etc. we dont use it yet
+	private static Matrix4x4 dirShadowMatrix = Matrix4x4.identity;
 
 	private ScriptableRenderContext context;
 	private CullingResults cullingResults;
@@ -39,8 +37,8 @@ public class GameShadowManager
 	internal void RenderShadows()
 	{
 		cmd.BeginSample("SHADOW_SAMPLE");
-		cmd.GetTemporaryRT(s_shadowTextureID, (int)settings.shadowTextureMapSize, (int)settings.shadowTextureMapSize, 32, FilterMode.Bilinear, RenderTextureFormat.Shadowmap);
-		cmd.SetRenderTarget(s_shadowTextureID, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+		cmd.GetTemporaryRT(s_shadowTextureMapID, (int)settings.shadowTextureMapSize, (int)settings.shadowTextureMapSize, 32, FilterMode.Bilinear, RenderTextureFormat.Shadowmap);
+		cmd.SetRenderTarget(s_shadowTextureMapID, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
 		cmd.ClearRenderTarget(true, false, Color.clear);
 		ExecuteBuffer();
 
@@ -54,16 +52,21 @@ public class GameShadowManager
 	private void RenderDirectionalShadows(int id, int textureSize)
 	{
 		ShadowDrawingSettings shadowDrawSettings = new ShadowDrawingSettings(cullingResults, id);
+		//foreach(var light in cullingResults.visibleLights)
+		//{
+		//	Debug.LogError(light.light.name);
+		//}
 		cullingResults.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-				id, 0, 0, Vector3.zero, textureSize, 0f, 
+				0, 0, 1, Vector3.zero, textureSize, 0f, 
 				out Matrix4x4 viewMatrix, out Matrix4x4 projectionMatrix, out ShadowSplitData splitData
 			);
-		dirShadowMatrices[id] = projectionMatrix * viewMatrix;
+		dirShadowMatrix = ConvertToAtlasMatrix(projectionMatrix * viewMatrix);
 		cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
 
-		cmd.SetGlobalMatrixArray(dirShadowMatricesID, dirShadowMatrices);
+		cmd.SetGlobalMatrix(dirShadowMatricesID, dirShadowMatrix);
 
 		ExecuteBuffer();
+		cmd.SetGlobalDepthBias(0f, 3f);
 		context.DrawShadows(ref shadowDrawSettings);
 	}
 	Matrix4x4 ConvertToAtlasMatrix(Matrix4x4 m)
@@ -92,7 +95,7 @@ public class GameShadowManager
 
 	internal void CleanUp()
 	{
-		cmd.ReleaseTemporaryRT(s_shadowTextureID);
+		cmd.ReleaseTemporaryRT(s_shadowTextureMapID);
 		ExecuteBuffer();
 	}
 
