@@ -66,7 +66,7 @@ public class GameShadowManager
 		cmd.SetGlobalMatrix(dirShadowMatricesID, dirShadowMatrix);
 
 		ExecuteBuffer();
-		cmd.SetGlobalDepthBias(0f, 3f);
+		cmd.SetGlobalDepthBias(0f, 1f);
 		context.DrawShadows(ref shadowDrawSettings);
 	}
 	Matrix4x4 ConvertToAtlasMatrix(Matrix4x4 m)

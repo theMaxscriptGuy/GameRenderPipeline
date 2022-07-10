@@ -16,5 +16,5 @@ MonoBehaviour:
   useSRPBatcher: 0
   shadowSettings:
     ShadowDistance: 100
-    shadowTextureMapSize: 1024
+    shadowTextureMapSize: 2048
   rendererName: GameRenderer
