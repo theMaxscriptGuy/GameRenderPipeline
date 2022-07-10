@@ -43,6 +43,9 @@ Shader "GameRP/BasicShader"
 
             #include "GameInput.hlsl"
             #include "GameLighting.hlsl"
+            #include "Shadows.hlsl"
+
+
 
             #pragma vertex vert
             #pragma fragment frag
@@ -81,6 +84,23 @@ Shader "GameRP/BasicShader"
                 color.rgb *= SAMPLE_TEXTURE2D(_TextureA, sampler_TextureA, IN.uv);
                 return color;
             }
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Tags {
+                "LightMode" = "ShadowCaster"
+            }
+                ColorMask 0
+
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma shader_feature _CLIPPING
+            #pragma multi_compile_instancing
+            #pragma vertex ShadowCasterPassVertex
+            #pragma fragment ShadowCasterPassFragment
+            #include "./ShadowCasterPass.hlsl"
             ENDHLSL
         }
     }
