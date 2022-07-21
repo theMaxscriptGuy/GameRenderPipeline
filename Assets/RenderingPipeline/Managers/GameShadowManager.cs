@@ -52,10 +52,12 @@ public class GameShadowManager
 	private void RenderDirectionalShadows(int id, int textureSize)
 	{
 		ShadowDrawingSettings shadowDrawSettings = new ShadowDrawingSettings(cullingResults, id);
-		//foreach(var light in cullingResults.visibleLights)
+		//foreach (var light in cullingResults.visibleLights)
 		//{
 		//	Debug.LogError(light.light.name);
 		//}
+		if (cullingResults.visibleLights.Length <= 0)
+			return;
 		cullingResults.ComputeDirectionalShadowMatricesAndCullingPrimitives(
 				0, 0, 1, Vector3.zero, textureSize, 0f, 
 				out Matrix4x4 viewMatrix, out Matrix4x4 projectionMatrix, out ShadowSplitData splitData
@@ -66,7 +68,7 @@ public class GameShadowManager
 		cmd.SetGlobalMatrix(dirShadowMatricesID, dirShadowMatrix);
 
 		ExecuteBuffer();
-		cmd.SetGlobalDepthBias(0f, 1f);
+		cmd.SetGlobalDepthBias(settings.bias, settings.slopeBias);
 		context.DrawShadows(ref shadowDrawSettings);
 	}
 	Matrix4x4 ConvertToAtlasMatrix(Matrix4x4 m)

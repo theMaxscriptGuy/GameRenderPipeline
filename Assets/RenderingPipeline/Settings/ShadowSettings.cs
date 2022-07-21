@@ -11,5 +11,7 @@ public class ShadowSettings
 	}
 
 	public float ShadowDistance = 100f;
+	public float bias = 0f;
+	public float slopeBias = 1f;
 	public TextureSize shadowTextureMapSize = TextureSize._1024;
 }
